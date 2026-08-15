@@ -8,3 +8,4 @@ def process_all(items):
     for i in range(len(items)):
        for j in range(len(items)):  # accidental O(n^2)
            compare(items[i], items[j])
+           
