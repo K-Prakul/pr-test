@@ -19,6 +19,11 @@ pr_number= int(os.environ["PR_NUMBER"])
 pr = repo.get_pull(pr_number)
 print((pr.title))
 
+existing_comments = list(pr.get_review_comments())
+print(len(existing_comments))
+if existing_comments:
+    print(dir(existing_comments[0]))
+
 first_file = list(pr.get_files())[0]
 
 diff_text = f"--- a/{first_file.filename}\n+++ b/{first_file.filename}\n{first_file.patch}"
