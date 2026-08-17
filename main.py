@@ -7,6 +7,7 @@ import os
 import json
 from models import Finding
 from pydantic import ValidationError
+from bandit_analysis import run_bandit
 
 load_dotenv()
 
@@ -70,6 +71,10 @@ def post_finding(pr, commit, findings):
         line=findings.line,
         side="RIGHT"
     )
-for finding in findings:
-    print(f"Posting: file={finding.file}, line={finding.line}")
+
+bandit_findings = run_bandit("git.py")
+
+all_findings = post_finding + bandit_findings
+
+for finding in all_findings:
     post_finding(pr, commit, finding)
