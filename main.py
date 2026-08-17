@@ -72,10 +72,13 @@ def post_finding(pr, commit, finding):
         side="RIGHT"
     )
 
-bandit_findings = run_bandit("git.py")
+bandit_findings = run_bandit(first_file.filename)
 
 all_findings = findings + bandit_findings
 
 for finding in all_findings:
     print(f"Posting: file={finding.file}, line={finding.line}, message={finding.message}")
-    post_finding(pr, commit, finding)
+    try:
+        post_finding(pr, commit, finding)
+    except Exception as e:
+        print(f"Failed to post finding: {e}")
