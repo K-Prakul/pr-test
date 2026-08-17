@@ -63,18 +63,19 @@ for f in findings:
 commit = pr.get_commits().reversed[0]
 
 
-def post_finding(pr, commit, findings):
+def post_finding(pr, commit, finding):
     pr.create_review_comment(
-        body=findings.message,
+        body=finding.message,
         commit=commit,
-        path=findings.file,
-        line=findings.line,
+        path=finding.file,
+        line=finding.line,
         side="RIGHT"
     )
 
 bandit_findings = run_bandit("git.py")
 
-all_findings = post_finding + bandit_findings
+all_findings = findings + bandit_findings
 
 for finding in all_findings:
+    print(f"Posting: file={finding.file}, line={finding.line}, message={finding.message}")
     post_finding(pr, commit, finding)
