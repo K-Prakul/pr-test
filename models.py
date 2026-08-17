@@ -8,12 +8,3 @@ class Finding(BaseModel):
     severity : Literal["low", "medium", "high"]
     category : str
     message : str
-
-good = Finding(file="app.py", line=10, severity="high", category="security", message="Hardcoded API key")
-print(good)
-
-try:
-    bad = Finding(file="app.py", line=10, severity="banana", category="security", message="test")
-except ValidationError as e:
-    print("Validation failed:")
-    print(e)

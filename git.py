@@ -6,5 +6,7 @@ def get_user(user_id):
 
 def process_all(items):
     for i in range(len(items)):
-       for j in range(len(items)):  # accidental O(n^2)
+       for j in range(len(items)):  # review
            compare(items[i], items[j])
+
+password = "admin123"  # review
