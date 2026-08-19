@@ -7,6 +7,7 @@ import os
 import json
 from models import Finding
 from pydantic import ValidationError
+from bandit_analysis import run_bandit
 
 load_dotenv()
 
@@ -17,6 +18,9 @@ repo = g.get_repo("K-Prakul/pr-test")
 pr_number= int(os.environ["PR_NUMBER"])
 pr = repo.get_pull(pr_number)
 print((pr.title))
+
+existing_comments = list(pr.get_review_comments())
+already_commented = {(c.path, c.line) for c in existing_comments}
 
 first_file = list(pr.get_files())[0]
 
@@ -62,14 +66,25 @@ for f in findings:
 commit = pr.get_commits().reversed[0]
 
 
-def post_finding(pr, commit, findings):
+def post_finding(pr, commit, finding):
     pr.create_review_comment(
-        body=findings.message,
+        body=finding.message,
         commit=commit,
-        path=findings.file,
-        line=findings.line,
+        path=finding.file,
+        line=finding.line,
         side="RIGHT"
     )
-for finding in findings:
-    print(f"Posting: file={finding.file}, line={finding.line}")
-    post_finding(pr, commit, finding)
+
+bandit_findings = run_bandit(first_file.filename)
+
+all_findings = findings + bandit_findings
+
+for finding in all_findings:
+    if (finding.file, finding.line) in already_commented:
+        print(f"Skipping duplicate: {finding.file}:{finding.line}")
+        continue
+    print(f"Posting: file={finding.file}, line={finding.line}, message={finding.message}")
+    try:
+        post_finding(pr, commit, finding)
+    except Exception as e:
+        print(f"Failed to post finding: {e}")
